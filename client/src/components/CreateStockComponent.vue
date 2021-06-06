@@ -141,4 +141,117 @@
 
                 <v-btn 
                   color="primary" 
-             
+                  @click="deleteValue(updateKey, updateValue)"
+                  height="56"
+                  width="95"
+                  tile
+                >
+                  Delete
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+
+          <v-btn color="primary" @click="step = 4, createStock(stocks)">Finish</v-btn>
+          <v-btn text @click="step = 2">Cancel</v-btn>
+        </v-stepper-content>
+
+        <!-- Step Four -->
+        <v-stepper-step :complete="step >4" step="4">
+          Confirmation
+        </v-stepper-step>
+
+        <v-stepper-content step="4">
+          <v-alert
+            outlined
+            type="success"
+            text
+          >
+            Stock created!
+          </v-alert>
+          <v-btn color="primary" @click="resetStepper()">Create Another</v-btn>
+          <v-btn text to="/">Home</v-btn>
+        </v-stepper-content>
+
+      </v-stepper>
+    </v-row>
+</template>
+
+<script>
+import Vue from 'vue'
+import StockService from '../StockService'
+
+export default {
+  name: 'CreateStockComponent',
+
+  data: () => ({
+    stocks: {},
+    error: '',
+    step: 1,
+    updateKey: null,
+    updateValue: null,
+
+    name: '',
+    nameValid: false,
+    nameRules: [
+      v => !!v || 'Name is required',
+      v => v.length <= 50 || 'Name must 50 or fewer characters',
+    ],
+
+    ticker: '',
+    tickerValid: false,
+    tickerRules: [
+      v => !!v || 'Ticker is required',
+      v => v.length <= 4 || 'Ticker 4 or fewer characters',
+    ]
+  }),
+  
+  methods: {
+    async createStock() {
+      await StockService.insertStock(this.stocks)
+    },
+    setName(name) {
+      Vue.set(this.stocks, "Company", name)
+    },
+    setTicker(ticker) {
+      Vue.set(this.stocks, "Ticker", ticker)
+    },
+    setValue(key, value) {
+      Vue.set(this.stocks, key, value)
+    },
+    deleteValue(key, value) {
+      Vue.delete(this.stocks, key, value)
+    },
+    uppercase() {
+      this.ticker = this.ticker.toUpperCase()
+    },
+    resetStepper() {
+      this.stocks = {},
+      this.error = '',
+      this.step = 1,
+      this.updateKey = null,
+      this.updateValue = null,
+
+      this.name = '',
+      this.nameValid = false,
+      this.nameRules = [
+        v => !!v || 'Name is required',
+        v => v.length <= 50 || 'Name must 50 or fewer characters',
+      ],
+
+      this.ticker = '',
+      this.tickerValid = false
+      this.tickerRules = [
+        v => !!v || 'Ticker is required',
+        v => v.length <= 4 || 'Ticker 4 or fewer characters',
+      ]
+    }
+  }
+}
+</script>
+
+<style>
+  .ticker input {
+    text-transform: uppercase
+  }
+</style>
